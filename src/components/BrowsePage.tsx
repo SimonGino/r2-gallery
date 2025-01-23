@@ -6,6 +6,7 @@ import { S3Client, ListObjectsV2Command, GetObjectCommand, DeleteObjectCommand }
 import '@radix-ui/themes/styles.css';
 import '../styles/waterfall.css';
 import * as Toast from '@radix-ui/react-toast';
+import Footer from './Footer';
 
 const s3Client = new S3Client({
     region: 'auto',
@@ -160,72 +161,79 @@ const BrowsePage = () => {
     return (
         <Theme>
             <Toast.Provider swipeDirection="right">
-                <Toast.Root
-                    className="bg-white rounded-lg shadow-lg p-4 items-center data-[state=open]:animate-slideIn data-[state=closed]:animate-hide data-[swipe=end]:animate-swipeOut"
-                    open={toastOpen}
-                    onOpenChange={setToastOpen}
-                >
-                    <Toast.Description>{toastMessage}</Toast.Description>
-                </Toast.Root>
-                <Toast.Viewport className="fixed bottom-0 right-0 flex flex-col p-6 gap-2 w-96 m-0 list-none z-50 outline-none" />
-                <div className="min-h-screen bg-gray-100 p-4">
-                <div className="max-w-6xl mx-auto">
-                    <div className="flex justify-between items-center mb-8">
-                        <h1 className="text-3xl font-bold text-gray-800">图片浏览</h1>
-                        <a href="/upload" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
-                            上传图片
-                        </a>
-                    </div>
-
-                    <InfiniteScroll
-                        dataLength={objects.length}
-                        next={fetchObjects}
-                        hasMore={hasMore}
-                        scrollThreshold="800px"
-                        loader={<div className="loading">加载中...</div>}
-                        endMessage={<div className="no-more">没有更多图片了</div>}
-                        className="waterfall-container"
-                    >
-                        {/* 空状态提示 */}
-                        {!isLoading && objects.length === 0 && (
-                            <div className="empty-state">暂无图片</div>
-                        )}
-                        <div className="waterfall-wrapper">
-                            {objects.filter(obj => obj.Key && isImageFile(obj.Key)).map((object) => (
-                                <div key={object.Key} className="waterfall-item">
-                                    <div className="image-wrapper">
-                                        <img
-                                            src={`https://${import.meta.env.VITE_BUCKET_ENDPOINT}/${encodeURIComponent(object.Key || '')}`}
-                                            alt={object.Key}
-                                            loading="lazy"
-                                        />
-                                        <div className="image-overlay flex flex-col justify-between p-4">
-                                            <div className="image-actions flex justify-end gap-2">
-                                                <button onClick={() => object.Key && downloadFile(object.Key)} title="下载" className="p-2 hover:bg-gray-200 rounded-full bg-white/80">
-                                                    <DownloadIcon className="w-4 h-4" />
-                                                </button>
-                                                <button onClick={() => window.open(`https://${import.meta.env.VITE_BUCKET_ENDPOINT}/${encodeURIComponent(object.Key || '')}`, '_blank')} title="查看原图" className="p-2 hover:bg-gray-200 rounded-full bg-white/80">
-                                                    <EyeOpenIcon className="w-4 h-4" />
-                                                </button>
-                                                <button onClick={() => object.Key && copyLink(object.Key)} title="复制链接" className="p-2 hover:bg-gray-200 rounded-full bg-white/80">
-                                                    <CopyIcon className="w-4 h-4" />
-                                                </button>
-                                                <button onClick={() => object.Key && deleteFile(object.Key)} title="删除" className="p-2 hover:bg-gray-200 rounded-full bg-white/80">
-                                                    <TrashIcon className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                            <div className="image-info bg-black/50 text-white p-2 rounded flex justify-between items-center mt-2">
-                                                <span>{formatSize(object.Size)}</span>
-                                                <span>{formatDate(object.LastModified)}</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                <div style={{ height: '100vh' }}>
+                    <div style={{ height: 'calc(100vh - 37px', overflow: 'auto' }}>
+                        <Toast.Root
+                            className="bg-white rounded-lg shadow-lg p-4 items-center data-[state=open]:animate-slideIn data-[state=closed]:animate-hide data-[swipe=end]:animate-swipeOut"
+                            open={toastOpen}
+                            onOpenChange={setToastOpen}
+                        >
+                            <Toast.Description>{toastMessage}</Toast.Description>
+                        </Toast.Root>
+                        <Toast.Viewport className="fixed bottom-0 right-0 flex flex-col p-6 gap-2 w-96 m-0 list-none z-[100] outline-none" />
+                        <div className="min-h-screen bg-gray-100 p-4">
+                            <div className="max-w-6xl mx-auto">
+                                <div className="flex justify-between items-center mb-8">
+                                    <h1 className="text-3xl font-bold text-gray-800">图片浏览</h1>
+                                    <a href="/upload" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                                        上传图片
+                                    </a>
                                 </div>
-                            ))}
+
+                                <InfiniteScroll
+                                    dataLength={objects.length}
+                                    next={fetchObjects}
+                                    hasMore={hasMore}
+                                    scrollThreshold="800px"
+                                    loader={<div className="loading">加载中...</div>}
+                                    endMessage={<div className="no-more">没有更多图片了</div>}
+                                    className="waterfall-container"
+                                >
+                                    {/* 空状态提示 */}
+                                    {!isLoading && objects.length === 0 && (
+                                        <div className="empty-state">暂无图片</div>
+                                    )}
+                                    <div className="waterfall-wrapper">
+                                        {objects.filter(obj => obj.Key && isImageFile(obj.Key)).map((object) => (
+                                            <div key={object.Key} className="waterfall-item">
+                                                <div className="image-wrapper">
+                                                    <img
+                                                        src={`https://${import.meta.env.VITE_BUCKET_ENDPOINT}/${encodeURIComponent(object.Key || '')}`}
+                                                        alt={object.Key}
+                                                        loading="lazy"
+                                                    />
+                                                    <div className="image-overlay flex flex-col justify-between p-4">
+                                                        <div className="image-actions flex justify-end gap-2">
+                                                            <button onClick={() => object.Key && downloadFile(object.Key)} title="下载" className="p-2 hover:bg-gray-200 rounded-full bg-white/80">
+                                                                <DownloadIcon className="w-4 h-4" />
+                                                            </button>
+                                                            <button onClick={() => window.open(`https://${import.meta.env.VITE_BUCKET_ENDPOINT}/${encodeURIComponent(object.Key || '')}`, '_blank')} title="查看原图" className="p-2 hover:bg-gray-200 rounded-full bg-white/80">
+                                                                <EyeOpenIcon className="w-4 h-4" />
+                                                            </button>
+                                                            <button onClick={() => object.Key && copyLink(object.Key)} title="复制链接" className="p-2 hover:bg-gray-200 rounded-full bg-white/80">
+                                                                <CopyIcon className="w-4 h-4" />
+                                                            </button>
+                                                            <button onClick={() => object.Key && deleteFile(object.Key)} title="删除" className="p-2 hover:bg-gray-200 rounded-full bg-white/80">
+                                                                <TrashIcon className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                        <div className="image-info bg-black/50 text-white p-2 rounded flex justify-between items-center mt-2">
+                                                            <span>{formatSize(object.Size)}</span>
+                                                            <span>{formatDate(object.LastModified)}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </InfiniteScroll>
+                            </div>
                         </div>
-                    </InfiniteScroll>
+                    </div>
+                    <div style={{ height: '37px' }}>
+                        <Footer />
+                    </div>
                 </div>
-            </div>
             </Toast.Provider>
         </Theme>
     );

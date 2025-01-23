@@ -2,9 +2,9 @@ import { GitHubLogoIcon, TwitterLogoIcon } from '@radix-ui/react-icons';
 
 const Footer = () => {
   return (
-    <footer className="fixed bottom-0 w-full bg-white border-t border-gray-200 py-4 px-6">
+    <footer className="relative w-full bg-white border-t border-gray-200 py-2 px-4">
       <div className="container mx-auto flex justify-between items-center">
-        <div className="text-sm text-gray-600">
+        <div className="text-xs text-gray-600">
           © {new Date().getFullYear()} R2 Gallery. All rights reserved.
         </div>
         <div className="flex space-x-4">
