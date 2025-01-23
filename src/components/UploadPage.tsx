@@ -3,6 +3,7 @@ import { Theme, Text } from '@radix-ui/themes';
 import { UploadIcon } from '@radix-ui/react-icons';
 import { useDropzone } from 'react-dropzone';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import MD5 from 'crypto-js/md5';
 import '@radix-ui/themes/styles.css';
 import * as Toast from '@radix-ui/react-toast';
 import { StreamingBlobPayloadInputTypes } from "@smithy/types";
@@ -20,6 +21,20 @@ const UploadPage = () => {
         setToastOpen(true);
     };
 
+    // 修改计算MD5的函数
+    const calculateMD5 = async (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const binary = reader.result;
+                const md5Hash = MD5(binary as string).toString();
+                resolve(md5Hash);
+            };
+            reader.onerror = (error) => reject(error);
+            reader.readAsBinaryString(file);
+        });
+    };
+
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
         for (const file of acceptedFiles) {
             if (!file.type.startsWith('image/')) {
@@ -32,6 +47,22 @@ const UploadPage = () => {
                 // 将文件转换为ArrayBuffer
                 const fileBuffer = await file.arrayBuffer() as StreamingBlobPayloadInputTypes;
 
+
+                // 生成时间戳前缀 (格式: YYYYMMDDHHmmss)
+                const timestamp = new Date().toISOString()
+                    .replace(/[-:]/g, '')  // 移除 - 和 :
+                    .replace('T', '')      // 移除 T
+                    .replace(/\..+/, '');  // 移除毫秒部分
+                
+                // 获取文件扩展名
+                const ext = file.name.split('.').pop() || '';
+                
+                // 计算文件的 MD5 作为唯一标识符
+                const uniqueId = await calculateMD5(file);
+                
+                // 新的文件命名格式：timestamp_md5hash.ext
+                const key = `${timestamp}_${uniqueId}.${ext}`;
+                
                 const s3Client = new S3Client({
                     region: 'auto',
                     endpoint: `https://${import.meta.env.VITE_CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -44,14 +75,14 @@ const UploadPage = () => {
 
                 const command = new PutObjectCommand({
                     Bucket: import.meta.env.VITE_BUCKET_NAME,
-                    Key: file.name,
+                    Key: key,
                     Body: fileBuffer,
-                    ContentType: file.type
+                    ContentType: file.type,
                 });
 
                 await s3Client.send(command);
                 showToast('上传成功');
-                setUploadedImage(`https://${import.meta.env.VITE_BUCKET_ENDPOINT}/${encodeURIComponent(file.name)}`);
+                setUploadedImage(`https://${import.meta.env.VITE_BUCKET_ENDPOINT}/${encodeURIComponent(key)}`);
             } catch (error) {
                 console.error('上传文件时出错:', error);
                 showToast('上传失败');
@@ -76,6 +107,7 @@ const UploadPage = () => {
                             className="bg-white rounded-lg shadow-lg p-4 items-center data-[state=open]:animate-slideIn data-[state=closed]:animate-hide data-[swipe=end]:animate-swipeOut"
                             open={toastOpen}
                             onOpenChange={setToastOpen}
+                            duration={2000}
                         >
                             <Toast.Description>{toastMessage}</Toast.Description>
                         </Toast.Root>

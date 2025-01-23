@@ -39,29 +39,35 @@ const BrowsePage = () => {
             setIsLoading(true);
             const command = new ListObjectsV2Command({
                 Bucket: import.meta.env.VITE_BUCKET_NAME,
-                MaxKeys: 5,
+                MaxKeys: 10,
                 ContinuationToken: nextContinuationToken || undefined
             });
 
             const response = await s3Client.send(command);
 
-            // 过滤时使用 loadedKeys.current
-            const newObjects = (response.Contents || []).filter(obj => {
-                if (!obj.Key || loadedKeys.current.has(obj.Key)) return false;
-                loadedKeys.current.add(obj.Key);
-                return true;
-            });
-            // 合并并按照创建时间排序
+            // 过滤重复项并按时间倒序排序
+            const newObjects = (response.Contents || [])
+                .filter(obj => {
+                    if (!obj.Key || loadedKeys.current.has(obj.Key)) return false;
+                    loadedKeys.current.add(obj.Key);
+                    return true;
+                })
+                .sort((a, b) => {
+                    const timeA = a.LastModified?.getTime() || 0;
+                    const timeB = b.LastModified?.getTime() || 0;
+                    return timeB - timeA; // 降序排列，最新的在前
+                });
+
+            // 合并时保持降序顺序
             setObjects(prev => {
                 const mergedObjects = [...prev, ...newObjects];
                 return mergedObjects.sort((a, b) => {
-                    const dateA = a.LastModified ? new Date(a.LastModified).getTime() : 0;
-                    const dateB = b.LastModified ? new Date(b.LastModified).getTime() : 0;
-                    return dateB - dateA; // 降序排列，最新的在前
+                    const timeA = a.LastModified?.getTime() || 0;
+                    const timeB = b.LastModified?.getTime() || 0;
+                    return timeB - timeA;
                 });
             });
 
-            // 修改 4：仅根据令牌判断是否继续
             const hasMoreData = !!response.NextContinuationToken;
             setNextContinuationToken(response.NextContinuationToken || null);
             setHasMore(hasMoreData);
@@ -167,6 +173,7 @@ const BrowsePage = () => {
                             className="bg-white rounded-lg shadow-lg p-4 items-center data-[state=open]:animate-slideIn data-[state=closed]:animate-hide data-[swipe=end]:animate-swipeOut"
                             open={toastOpen}
                             onOpenChange={setToastOpen}
+                            duration={2000}
                         >
                             <Toast.Description>{toastMessage}</Toast.Description>
                         </Toast.Root>
@@ -189,12 +196,13 @@ const BrowsePage = () => {
                                     endMessage={<div className="no-more">没有更多图片了</div>}
                                     className="waterfall-container"
                                 >
-                                    {/* 空状态提示 */}
                                     {!isLoading && objects.length === 0 && (
                                         <div className="empty-state">暂无图片</div>
                                     )}
                                     <div className="waterfall-wrapper">
-                                        {objects.filter(obj => obj.Key && isImageFile(obj.Key)).map((object) => (
+                                        {objects
+                                            .filter(obj => obj.Key && isImageFile(obj.Key))
+                                            .map((object) => (
                                             <div key={object.Key} className="waterfall-item">
                                                 <div className="image-wrapper">
                                                     <img

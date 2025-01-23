@@ -1,34 +1,19 @@
 .waterfall-container {
   width: 100%;
-  padding: 0 15px;
+  padding: 0;
+  margin: 0 auto;
 }
 
 .waterfall-wrapper {
-  column-count: 4;
-  column-gap: 15px;
-}
-
-@media (max-width: 1200px) {
-  .waterfall-wrapper {
-    column-count: 3;
-  }
-}
-
-@media (max-width: 768px) {
-  .waterfall-wrapper {
-    column-count: 2;
-  }
-}
-
-@media (max-width: 480px) {
-  .waterfall-wrapper {
-    column-count: 1;
-  }
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
 }
 
 .waterfall-item {
   break-inside: avoid;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .image-wrapper {
