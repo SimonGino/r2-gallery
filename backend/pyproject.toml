@@ -1,0 +1,18 @@
+[project]
+name = "r2-gallery"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "SimonGino", email = "rwjeek@gmail.com"},
+]
+dependencies = ["fastapi>=0.115.7", "uvicorn>=0.34.0", "python-multipart>=0.0.20", "boto3>=1.36.5", "pydantic>=2.10.6", "python-dotenv>=1.0.1", "pydantic-settings>=2.7.1", "sqlalchemy>=2.0.37", "aiofiles>=24.1.0"]
+requires-python = "==3.9.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+distribution = false
+
+[tool.pdm.scripts]
+start = "uvicorn src.main:app --reload"

@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import BrowsePage from './components/BrowsePage';
-import UploadPage from './components/UploadPage';
+import BrowsePage from './pages/BrowsePage';
+import UploadPage from './pages/UploadPage';
 
 function App() {
   return (
@@ -15,4 +15,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

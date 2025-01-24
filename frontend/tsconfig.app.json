@@ -20,5 +20,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
   },
-  "include": ["src"]
+  "include": ["src", "frontend/src/components", "frontend/src/pages/BrowsePage.tsx", "frontend/src/pages/UploadPage.tsx", "frontend/src/utils/format.ts", "frontend/src/utils/s3.ts", "frontend/src/App.tsx"]
 }
