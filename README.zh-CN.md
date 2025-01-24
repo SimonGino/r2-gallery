@@ -4,6 +4,7 @@
 
 一个现代化的响应式Web应用，用于管理和展示存储在Cloudflare R2中的图片。使用React和TypeScript构建，具有美观的瀑布流布局和拖拽上传功能。
 
+![Markdown Logo](https://images.mytest.cc/20250124133938_26129260f0bfe221329a4aeaa09c7efe.png "Markdown Logo")
 ## 功能特点
 
 - 🖼️ 美观的瀑布流图片展示

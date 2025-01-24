@@ -4,6 +4,7 @@
 
 A modern, responsive web application for managing and displaying images stored in Cloudflare R2 storage. Built with React and TypeScript, featuring a beautiful waterfall layout and drag-and-drop upload functionality.
 
+![Markdown Logo](https://images.mytest.cc/20250124133938_26129260f0bfe221329a4aeaa09c7efe.png "Markdown Logo")
 ## Features
 
 - 🖼️ Beautiful waterfall layout for image display
