@@ -3,6 +3,8 @@
 
 一个用于管理和浏览存储在 Cloudflare R2 存储中的图片的现代化 Web 应用。
 
+## Demo
+![Demo](https://oss.mytest.cc/Snipaste_2025-01-24_13-39-25.png)
 ## 技术栈
 
 - React 18
