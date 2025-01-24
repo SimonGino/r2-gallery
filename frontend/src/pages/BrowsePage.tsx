@@ -121,14 +121,8 @@ const BrowsePage = () => {
             setIsSyncing(true);
             await syncImages();
             showToast('同步成功');
-
-            // 重置所有状态
-            setObjects([]);
-            loadedKeys.current.clear();
-            setCurrentPage(1);
-            setHasMore(true);
-            setIsFirstLoad(true); // 触发初始化加载逻辑
-
+            // 直接刷新页面
+            window.location.reload();
         } catch (error) {
             console.error('同步失败:', error);
             showToast('同步失败');
@@ -142,6 +136,14 @@ const BrowsePage = () => {
             <div style={{ height: '100vh' }}>
                 <div style={{ height: 'calc(100vh - 37px)', overflow: 'auto' }} id="scrollableDiv">
                     <Toast />
+                    {isSyncing && (
+                        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+                            <div className="bg-white p-6 rounded-lg shadow-xl text-center">
+                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                                <p className="text-lg">同步中，请稍候...</p>
+                            </div>
+                        </div>
+                    )}
                     <div className="min-h-screen bg-gray-100 p-4">
                         <div className="max-w-6xl mx-auto">
                             <div className="flex justify-between items-center mb-8">
@@ -211,8 +213,8 @@ const BrowsePage = () => {
                             <InfiniteScroll
                                 dataLength={objects.length}
                                 next={() => {
-                                    if (!isLoading && hasMore) {
-                                        setCurrentPage(prev => prev + 1); // 手动控制翻页
+                                    if (!isLoading && hasMore && !isSyncing) {
+                                        setCurrentPage(prev => prev + 1);
                                     }
                                 }}
                                 hasMore={hasMore}

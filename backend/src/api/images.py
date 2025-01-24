@@ -12,9 +12,13 @@ import aiofiles
 import os
 from tempfile import NamedTemporaryFile
 from ..core.sync import sync_images
+import io
 
 router = APIRouter()
 settings = get_settings()
+# 在文件顶部初始化客户端
+s3_client = get_r2_client()
+
 
 @router.post("/sync")
 async def sync_images_manually():
@@ -101,29 +105,26 @@ async def upload_image(
             file_name = f"{timestamp}_{md5_hash.hexdigest()}{file_ext}"
             thumbnail_name = f"thumb_{file_name}"
 
+            # 上传原图到R2
+            s3_client.upload_fileobj(
+                io.BytesIO(content),
+                settings.BUCKET_NAME,
+                file_name
+            )
+
             # 生成缩略图
             thumbnail_data = create_thumbnail(content)
-
-            # 上传原图到R2（使用新的客户端实例）
-            s3_client = get_r2_client()
-            s3_client.put_object(
-                Bucket=settings.BUCKET_NAME,
-                Key=file_name,
-                Body=content,
-                ContentType=file.content_type
+            # 上传缩略图到R2
+            thumbnail_io = io.BytesIO(thumbnail_data)
+            thumbnail_io.seek(0)  # 确保数据流指针位于起始位置
+            s3_client.upload_fileobj(
+                thumbnail_io,
+                settings.BUCKET_NAME,
+                thumbnail_name,
+                ExtraArgs={'ContentType': 'image/jpeg'}
             )
 
-            # 上传缩略图到R2（使用新的客户端实例）
-            s3_client = get_r2_client()
-            s3_client.put_object(
-                Bucket=settings.BUCKET_NAME,
-                Key=thumbnail_name,
-                Body=thumbnail_data,
-                ContentType='image/jpeg'
-            )
-
-            # 获取文件信息（使用新的客户端实例）
-            s3_client = get_r2_client()
+            # 获取文件信息
             response = s3_client.head_object(
                 Bucket=settings.BUCKET_NAME,
                 Key=file_name
@@ -166,8 +167,6 @@ async def upload_image(
 @router.get("/download/{key}")
 async def download_image(key: str):
     try:
-        # 从R2获取图片
-        s3_client = get_r2_client()
         try:
             response = s3_client.get_object(
                 Bucket=settings.BUCKET_NAME,
@@ -191,8 +190,6 @@ async def delete_image(
     db: Session = Depends(get_db)
 ):
     try:
-        # 从R2删除原图和缩略图
-        s3_client = get_r2_client()
         s3_client.delete_object(
             Bucket=settings.BUCKET_NAME,
             Key=key

@@ -8,21 +8,18 @@ import io
 import requests
 
 settings = get_settings()
+s3_client = get_r2_client()
 
 async def generate_thumbnail_if_missing(key: str) -> str:
     """为指定的图片生成缩略图（如果不存在）"""
     thumbnail_key = f"thumb_{key}"
     try:
-        # 为每次操作创建新的客户端实例
-        s3_client = get_r2_client()
-        
+
         # 检查缩略图是否存在
         s3_client.head_object(Bucket=settings.BUCKET_NAME, Key=thumbnail_key)
         return f"https://{settings.BUCKET_ENDPOINT}/{thumbnail_key}"
     except:
         try:
-            # 重新创建客户端实例用于获取原图
-            s3_client = get_r2_client()
             # 获取原图
             response = s3_client.get_object(Bucket=settings.BUCKET_NAME, Key=key)
             image_data = response['Body'].read()
@@ -30,8 +27,6 @@ async def generate_thumbnail_if_missing(key: str) -> str:
             # 生成缩略图
             thumbnail_data = create_thumbnail(image_data)
             
-            # 重新创建客户端实例用于上传缩略图
-            s3_client = get_r2_client()
             # 上传缩略图
             s3_client.put_object(
                 Bucket=settings.BUCKET_NAME,
@@ -46,8 +41,6 @@ async def generate_thumbnail_if_missing(key: str) -> str:
             return None
 
 async def sync_images():
-    """同步R2中的图片到数据库"""
-    s3_client = get_r2_client()
     db = next(get_db())
     
     try:
