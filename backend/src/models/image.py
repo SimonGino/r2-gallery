@@ -7,6 +7,7 @@ class ImageObject(BaseModel):
     last_modified: datetime
     size: int
     url: str
+    thumbnail_url: Optional[str] = None
 
 class ImageListResponse(BaseModel):
     items: List[ImageObject]

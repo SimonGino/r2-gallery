@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException, UploadFile, Depends, Query
+from fastapi import APIRouter, HTTPException, UploadFile, Depends, Query, Response
 from typing import List, Optional
-from ..core.storage import get_r2_client
+from ..core.storage import get_r2_client, create_thumbnail
 from ..models.image import ImageObject, ImageListResponse
 from ..core.config import get_settings
 from botocore.exceptions import ClientError
@@ -55,7 +55,8 @@ async def list_images(
                     key=img.key,
                     last_modified=img.last_modified,
                     size=img.size,
-                    url=img.url
+                    url=img.url,
+                    thumbnail_url=img.thumbnail_url
                 ) for img in images
             ],
             has_more=has_more,
@@ -98,8 +99,12 @@ async def upload_image(
             # 生成文件名：时间戳_MD5值.扩展名
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
             file_name = f"{timestamp}_{md5_hash.hexdigest()}{file_ext}"
+            thumbnail_name = f"thumb_{file_name}"
 
-            # 上传到R2
+            # 生成缩略图
+            thumbnail_data = create_thumbnail(content)
+
+            # 上传原图到R2（使用新的客户端实例）
             s3_client = get_r2_client()
             s3_client.put_object(
                 Bucket=settings.BUCKET_NAME,
@@ -108,7 +113,17 @@ async def upload_image(
                 ContentType=file.content_type
             )
 
-            # 获取文件信息
+            # 上传缩略图到R2（使用新的客户端实例）
+            s3_client = get_r2_client()
+            s3_client.put_object(
+                Bucket=settings.BUCKET_NAME,
+                Key=thumbnail_name,
+                Body=thumbnail_data,
+                ContentType='image/jpeg'
+            )
+
+            # 获取文件信息（使用新的客户端实例）
+            s3_client = get_r2_client()
             response = s3_client.head_object(
                 Bucket=settings.BUCKET_NAME,
                 Key=file_name
@@ -119,7 +134,8 @@ async def upload_image(
                 key=file_name,
                 size=len(content),
                 last_modified=response['LastModified'],
-                url=f"https://{settings.BUCKET_ENDPOINT}/{file_name}"
+                url=f"https://{settings.BUCKET_ENDPOINT}/{file_name}",
+                thumbnail_url=f"https://{settings.BUCKET_ENDPOINT}/{thumbnail_name}"
             )
             db.add(image)
             db.commit()
@@ -133,7 +149,8 @@ async def upload_image(
                 key=image.key,
                 last_modified=image.last_modified,
                 size=image.size,
-                url=image.url
+                url=image.url,
+                thumbnail_url=image.thumbnail_url
             )
 
     except Exception as e:
@@ -146,17 +163,44 @@ async def upload_image(
         print(f"Error in upload_image: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/download/{key}")
+async def download_image(key: str):
+    try:
+        # 从R2获取图片
+        s3_client = get_r2_client()
+        try:
+            response = s3_client.get_object(
+                Bucket=settings.BUCKET_NAME,
+                Key=key
+            )
+            return Response(
+                content=response['Body'].read(),
+                media_type=response['ContentType']
+            )
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchKey':
+                raise HTTPException(status_code=404, detail="Image not found")
+            raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        print(f"Error in download_image: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.delete("/{key}")
 async def delete_image(
     key: str,
     db: Session = Depends(get_db)
 ):
     try:
-        # 从R2删除
+        # 从R2删除原图和缩略图
         s3_client = get_r2_client()
         s3_client.delete_object(
             Bucket=settings.BUCKET_NAME,
             Key=key
+        )
+        # 删除缩略图
+        s3_client.delete_object(
+            Bucket=settings.BUCKET_NAME,
+            Key=f"thumb_{key}"
         )
 
         # 从数据库删除

@@ -13,6 +13,7 @@ class Image(Base):
     size = Column(Integer)
     last_modified = Column(DateTime, index=True)
     url = Column(String)
+    thumbnail_url = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

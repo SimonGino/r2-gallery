@@ -243,9 +243,25 @@ const BrowsePage = () => {
                                             <div key={object.key} className="waterfall-item">
                                                 <div className="image-wrapper">
                                                     <img
-                                                        src={object.url}
+                                                        src={object.thumbnail_url || object.url}
                                                         alt={object.key}
                                                         loading="lazy"
+                                                        onClick={() => setSelectedImage(object.url)}
+                                                        className="cursor-pointer transition-opacity duration-300"
+                                                        onError={(e) => {
+                                                            // 如果缩略图加载失败，尝试加载原图
+                                                            const target = e.target as HTMLImageElement;
+                                                            if (target.src !== object.url) {
+                                                                target.src = object.url;
+                                                            }
+                                                        }}
+                                                        style={{
+                                                            opacity: '0',
+                                                        }}
+                                                        onLoad={(e) => {
+                                                            const target = e.target as HTMLImageElement;
+                                                            target.style.opacity = '1';
+                                                        }}
                                                     />
                                                     <div className="image-overlay flex flex-col justify-between p-4">
                                                         <div className="image-actions flex justify-end gap-2">

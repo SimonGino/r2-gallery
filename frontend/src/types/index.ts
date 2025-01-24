@@ -3,6 +3,7 @@ export interface R2Object {
     last_modified: string;
     size: number;
     url: string;
+    thumbnail_url?: string;
 }
 
 export interface ImageListResponse {
