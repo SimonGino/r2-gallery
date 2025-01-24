@@ -1,18 +1,7 @@
 # R2 图片库
-
 [English](./README.md)
 
-一个现代化的响应式Web应用，用于管理和展示存储在Cloudflare R2中的图片。使用React和TypeScript构建，具有美观的瀑布流布局和拖拽上传功能。
-
-![Markdown Logo](https://images.mytest.cc/20250124133938_26129260f0bfe221329a4aeaa09c7efe.png "Markdown Logo")
-## 功能特点
-
-- 🖼️ 美观的瀑布流图片展示
-- 📤 拖拽式图片上传
-- 🔄 无限滚动浏览
-- 📱 全设备响应式设计
-- 🚀 基于Cloudflare R2存储的高效性能
-- 🎨 使用Radix UI和Tailwind CSS的现代界面
+一个用于管理和浏览存储在 Cloudflare R2 存储中的图片的现代化 Web 应用。
 
 ## 技术栈
 
@@ -21,81 +10,97 @@
 - Vite
 - Tailwind CSS
 - Radix UI
-- AWS SDK（用于Cloudflare R2）
+- AWS SDK（用于 Cloudflare R2）
 - React Router
 - React Dropzone
+- FastAPI（后端）
+- SQLite
+- Docker & Docker Compose
 
-## 前置要求
+## 环境要求
 
-- Node.js 16+
-- 启用了R2存储的Cloudflare账户
-- R2存储桶和访问凭证
+- Node.js 20+
+- Python 3.9+
+- Docker 和 Docker Compose（用于生产环境部署）
+- Cloudflare R2 存储账号
 
-## 快速开始
+## 开发环境搭建
 
-1. 克隆仓库：
+### 后端设置
 
+1. 进入后端目录：
 ```bash
-git clone https://github.com/yourusername/r2-gallery.git
-cd r2-gallery
+cd backend
+```
+
+2. 复制环境变量模板并配置 R2 凭证：
+```bash
+cp .env.example .env
+```
+
+3. 使用 PDM 安装依赖：
+```bash
+pip install pdm
+pdm install
+```
+
+4. 启动开发服务器：
+```bash
+pdm run dev
+```
+
+### 前端设置
+
+1. 进入前端目录：
+```bash
+cd frontend
 ```
 
 2. 安装依赖：
-
 ```bash
 npm install
 ```
 
-3. 在根目录创建`.env`文件并添加Cloudflare R2凭证：
-
-```env
-VITE_CLOUDFLARE_ACCOUNT_ID=your_account_id
-VITE_CLOUDFLARE_ACCESS_KEY_ID=your_access_key_id
-VITE_CLOUDFLARE_SECRET_ACCESS_KEY=your_access_key
-VITE_BUCKET_NAME=your_bucket_name
-VITE_BUCKET_ENDPOINT=your_endpoint_name
-```
-
-4. 启动开发服务器：
-
+3. 启动开发服务器：
 ```bash
 npm run dev
 ```
 
-5. 构建生产版本：
+## 生产环境部署
 
+1. 在 `.env` 文件中配置环境变量
+
+2. 构建并启动容器：
 ```bash
-npm run build
+docker-compose up -d --build
 ```
 
-## 使用说明
+应用将在 http://localhost:80 上可访问
 
-### 浏览图片
+## 功能特性
 
-- 主页以瀑布流布局展示所有图片
-- 向下滚动自动加载更多图片
-- 点击图片操作按钮可以：
-  - 下载图片
-  - 查看原图
-  - 复制图片链接
-  - 删除图片
+- 图片上传并自动生成缩略图
+- 支持无限滚动的图片库
+- 图片预览和下载
+- 响应式设计
+- 自动与 R2 存储同步
+- Gzip 压缩提升性能
+- Docker 支持便捷部署
 
-### 上传图片
+## 环境变量
 
-1. 点击"上传图片"按钮
-2. 将图片拖放到上传区域或点击选择文件
-3. 支持的格式：JPG、JPEG、PNG、GIF、WEBP
-4. 查看上传进度和确认信息
+### 后端
 
-## Docker支持
+- `CLOUDFLARE_ACCOUNT_ID`：你的 Cloudflare 账号 ID
+- `CLOUDFLARE_ACCESS_KEY_ID`：R2 访问密钥 ID
+- `CLOUDFLARE_SECRET_ACCESS_KEY`：R2 访问密钥
+- `BUCKET_NAME`：R2 存储桶名称
+- `BUCKET_ENDPOINT`：R2 存储桶访问端点
 
-使用Docker运行应用：
+## 贡献
 
-```bash
-docker build -t r2-gallery .
-docker run -p 5173:5173 r2-gallery
-```
+欢迎提交 Pull Request。对于重大变更，请先开 Issue 讨论你想要改变的内容。
 
 ## 许可证
 
-MIT
+[MIT](https://choosealicense.com/licenses/mit/)

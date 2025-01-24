@@ -1,18 +1,7 @@
 # R2 Gallery
-
 [中文文档](./README.zh-CN.md)
 
-A modern, responsive web application for managing and displaying images stored in Cloudflare R2 storage. Built with React and TypeScript, featuring a beautiful waterfall layout and drag-and-drop upload functionality.
-
-![Markdown Logo](https://images.mytest.cc/20250124133938_26129260f0bfe221329a4aeaa09c7efe.png "Markdown Logo")
-## Features
-
-- 🖼️ Beautiful waterfall layout for image display
-- 📤 Drag-and-drop image upload
-- 🔄 Infinite scroll for smooth browsing
-- 📱 Responsive design for all devices
-- 🚀 Fast and efficient using Cloudflare R2 storage
-- 🎨 Modern UI with Radix UI and Tailwind CSS
+A modern web application for managing and browsing images stored in Cloudflare R2 storage.
 
 ## Tech Stack
 
@@ -24,78 +13,94 @@ A modern, responsive web application for managing and displaying images stored i
 - AWS SDK (for Cloudflare R2)
 - React Router
 - React Dropzone
+- FastAPI (Backend)
+- SQLite
+- Docker & Docker Compose
 
 ## Prerequisites
 
-- Node.js 16+
-- A Cloudflare account with R2 storage enabled
-- R2 bucket and access credentials
+- Node.js 20+
+- Python 3.9+
+- Docker and Docker Compose (for production deployment)
+- Cloudflare R2 Storage Account
 
-## Getting Started
+## Development Setup
 
-1. Clone the repository:
+### Backend Setup
 
+1. Navigate to the backend directory:
 ```bash
-git clone https://github.com/yourusername/r2-gallery.git
-cd r2-gallery
+cd backend
+```
+
+2. Copy the environment template and configure your R2 credentials:
+```bash
+cp .env.example .env
+```
+
+3. Install dependencies using PDM:
+```bash
+pip install pdm
+pdm install
+```
+
+4. Start the development server:
+```bash
+pdm run dev
+```
+
+### Frontend Setup
+
+1. Navigate to the frontend directory:
+```bash
+cd frontend
 ```
 
 2. Install dependencies:
-
 ```bash
 npm install
 ```
 
-3. Create a `.env` file in the root directory and add your Cloudflare R2 credentials:
-
-```env
-VITE_CLOUDFLARE_ACCOUNT_ID=your_account_id
-VITE_CLOUDFLARE_ACCESS_KEY_ID=your_access_key_id
-VITE_CLOUDFLARE_SECRET_ACCESS_KEY=your_access_key
-VITE_BUCKET_NAME=your_bucket_name
-VITE_BUCKET_ENDPOINT=your_endpoint_name
-```
-
-4. Start the development server:
-
+3. Start the development server:
 ```bash
 npm run dev
 ```
 
-5. Build for production:
+## Production Deployment
 
+1. Configure your environment variables in `.env` file
+
+2. Build and start the containers:
 ```bash
-npm run build
+docker-compose up -d --build
 ```
 
-## Usage
+The application will be available at http://localhost:80
 
-### Browsing Images
+## Features
 
-- The home page displays all images in a waterfall layout
-- Scroll down to load more images automatically
-- Click on image actions to:
-  - Download the image
-  - View the original image
-  - Copy the image link
-  - Delete the image
+- Image upload with automatic thumbnail generation
+- Image gallery with infinite scroll
+- Image preview and download
+- Responsive design
+- Automatic synchronization with R2 storage
+- Gzip compression for better performance
+- Docker support for easy deployment
 
-### Uploading Images
+## Environment Variables
 
-1. Click the "Upload Image" button
-2. Drag and drop images into the upload area or click to select files
-3. Supported formats: JPG, JPEG, PNG, GIF, WEBP
-4. View upload progress and confirmation
+### Backend
 
-## Docker Support
+- `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare account ID
+- `CLOUDFLARE_ACCESS_KEY_ID`: R2 access key ID
+- `CLOUDFLARE_SECRET_ACCESS_KEY`: R2 secret access key
+- `BUCKET_NAME`: R2 bucket name
+- `BUCKET_ENDPOINT`: R2 bucket endpoint
 
-To run the application using Docker:
+## Contributing
 
-```bash
-docker build -t r2-gallery .
-docker run -p 5173:5173 r2-gallery
-```
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
 
-MIT
+[MIT](https://choosealicense.com/licenses/mit/)

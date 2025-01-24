@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import * as RadixToast from '@radix-ui/react-toast';
 import { TOAST_DURATION } from '../../constants';
 import { ToastViewport } from './ToastViewport';
@@ -36,4 +36,4 @@ export const useToast = () => {
         Toast: () => <Toast open={open} onOpenChange={setOpen} message={message} />,
         showToast
     };
-}; 
+};
