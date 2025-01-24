@@ -25,6 +25,16 @@ export async function uploadImage(file: File): Promise<R2Object> {
     return response.json();
 }
 
+export async function syncImages(): Promise<{ message: string }> {
+    const response = await fetch('/api/images/sync', {
+        method: 'POST'
+    });
+    if (!response.ok) {
+        throw new Error('Failed to sync images');
+    }
+    return response.json();
+}
+
 export async function deleteImage(key: string): Promise<void> {
     const response = await fetch(`/api/images/${encodeURIComponent(key)}`, {
         method: 'DELETE',
@@ -41,4 +51,4 @@ export async function downloadImage(key: string): Promise<Blob> {
         throw new Error('Failed to download image');
     }
     return response.blob();
-} 
+}

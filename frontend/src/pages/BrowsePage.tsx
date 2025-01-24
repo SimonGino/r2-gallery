@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Theme } from '@radix-ui/themes';
-import { DownloadIcon, EyeOpenIcon, CopyIcon, TrashIcon, GearIcon } from '@radix-ui/react-icons';
+import { DownloadIcon, EyeOpenIcon, CopyIcon, TrashIcon, GearIcon, UpdateIcon } from '@radix-ui/react-icons';
 import * as Dialog from '@radix-ui/react-dialog';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Masonry from 'react-masonry-css';
 import type { R2Object } from '../types';
 import { useToast } from '../components/Toast/Toast';
 import Footer from '../components/Footer';
-import { listImages, downloadImage, deleteImage } from '../utils/api';
+import { listImages, downloadImage, deleteImage, syncImages } from '../utils/api';
 import { formatSize, formatDate, isImageFile } from '../utils/format';
 import '@radix-ui/themes/styles.css';
 import '../styles/waterfall.css';
@@ -18,52 +18,52 @@ const BrowsePage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
+    const [isSyncing, setIsSyncing] = useState(false);
     const [columnCount, setColumnCount] = useState(() => {
         const saved = localStorage.getItem('columnCount');
         return saved ? parseInt(saved, 10) : 3;
     });
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const loadedKeys = useRef(new Set<string>());
-    const isInitialLoad = useRef(true);
     const { Toast, showToast } = useToast();
 
     const fetchObjects = async () => {
-        if (isLoading || !hasMore) {
-            console.log('Skip fetching:', { isLoading, hasMore, currentPage });
-            return;
-        }
+        if (isLoading || !hasMore) return;
 
         try {
             setIsLoading(true);
-            console.log('Fetching page:', currentPage);
+            console.log('当前请求页码:', currentPage);
             const data = await listImages({ page: currentPage });
-            console.log('Fetched data:', data);
 
-            const newObjects = data.items.filter(obj => {
-                if (!obj.key || loadedKeys.current.has(obj.key)) return false;
-                loadedKeys.current.add(obj.key);
-                return true;
-            });
+            const newObjects = data.items.filter(obj =>
+                obj.key && !loadedKeys.current.has(obj.key)
+            );
+            newObjects.forEach(obj => loadedKeys.current.add(obj.key!));
 
             setObjects(prev => [...prev, ...newObjects]);
             setHasMore(data.has_more);
 
-            if (data.has_more && !isInitialLoad.current) {
-                setCurrentPage(prev => prev + 1);
-            }
-            isInitialLoad.current = false;
+            // 修改2: 移除自动翻页逻辑
         } catch (error) {
-            console.error('Error fetching objects:', error);
+            console.error('加载失败:', error);
             setHasMore(false);
         } finally {
             setIsLoading(false);
+            setIsFirstLoad(false); // 标记首次加载完成
         }
     };
 
+    // 新增 useEffect 监听 currentPage
     useEffect(() => {
-        console.log('Initial load effect');
-        fetchObjects();
-    }, []);
+        if (isFirstLoad) {
+            // 初始加载强制请求
+            fetchObjects();
+        } else {
+            // 后续由页码变化触发
+            fetchObjects();
+        }
+    }, [currentPage]); // ✅ 统一监听页码变化
 
     const downloadFile = async (key: string) => {
         try {
@@ -115,6 +115,28 @@ const BrowsePage = () => {
         setIsSettingsOpen(false);
     };
 
+    const handleSync = async () => {
+        if (isSyncing) return;
+        try {
+            setIsSyncing(true);
+            await syncImages();
+            showToast('同步成功');
+
+            // 重置所有状态
+            setObjects([]);
+            loadedKeys.current.clear();
+            setCurrentPage(1);
+            setHasMore(true);
+            setIsFirstLoad(true); // 触发初始化加载逻辑
+
+        } catch (error) {
+            console.error('同步失败:', error);
+            showToast('同步失败');
+        } finally {
+            setIsSyncing(false);
+        }
+    };
+
     return (
         <Theme>
             <div style={{ height: '100vh' }}>
@@ -131,6 +153,14 @@ const BrowsePage = () => {
                                         title="布局设置"
                                     >
                                         <GearIcon className="w-5 h-5" />
+                                    </button>
+                                    <button
+                                        onClick={handleSync}
+                                        disabled={isSyncing}
+                                        className={`flex items-center gap-1 px-3 py-2 rounded-md ${isSyncing ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} text-white transition-colors`}
+                                    >
+                                        <UpdateIcon className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+                                        {isSyncing ? '同步中...' : '同步'}
                                     </button>
                                     <a href="/upload" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
                                         上传图片
@@ -180,7 +210,11 @@ const BrowsePage = () => {
 
                             <InfiniteScroll
                                 dataLength={objects.length}
-                                next={fetchObjects}
+                                next={() => {
+                                    if (!isLoading && hasMore) {
+                                        setCurrentPage(prev => prev + 1); // 手动控制翻页
+                                    }
+                                }}
                                 hasMore={hasMore}
                                 loader={<div className="loading">加载中...</div>}
                                 endMessage={<div className="no-more">没有更多图片了</div>}

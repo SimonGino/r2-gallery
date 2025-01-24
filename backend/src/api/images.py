@@ -11,9 +11,20 @@ import hashlib
 import aiofiles
 import os
 from tempfile import NamedTemporaryFile
+from ..core.sync import sync_images
 
 router = APIRouter()
 settings = get_settings()
+
+@router.post("/sync")
+async def sync_images_manually():
+    """手动触发同步R2存储和数据库"""
+    try:
+        await sync_images()
+        return {"message": "同步成功"}
+    except Exception as e:
+        print(f"Manual sync failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/list", response_model=ImageListResponse)
 async def list_images(
@@ -157,4 +168,4 @@ async def delete_image(
         return {"message": "Image deleted successfully"}
     except Exception as e:
         print(f"Error in delete_image: {e}")
-        raise HTTPException(status_code=500, detail=str(e)) 
+        raise HTTPException(status_code=500, detail=str(e))

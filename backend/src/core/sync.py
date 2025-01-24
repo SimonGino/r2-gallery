@@ -53,10 +53,8 @@ async def sync_images():
         db.close()
 
 async def start_sync_task():
-    """启动定期同步任务"""
-    while True:
-        try:
-            await sync_images()
-        except Exception as e:
-            print(f"Sync failed: {e}")
-        await asyncio.sleep(300)  # 每5分钟同步一次 
+    """启动时执行一次同步任务"""
+    try:
+        await sync_images()
+    except Exception as e:
+        print(f"Sync failed: {e}")
