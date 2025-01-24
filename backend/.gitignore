@@ -172,3 +172,4 @@ __pycache__/
 *$py.class
 .Python
 .venv/
+images.db
