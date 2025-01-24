@@ -5,10 +5,14 @@
 }
 
 .waterfall-wrapper {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-  padding: 20px;
+  display: flex;
+  margin-left: -20px;
+  width: auto;
+}
+
+.waterfall-column {
+  padding-left: 20px;
+  background-clip: padding-box;
 }
 
 .waterfall-item {
