@@ -26,3 +26,4 @@ dist-ssr
 # personal
 .env
 .vite
+images.db
