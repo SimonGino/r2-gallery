@@ -18,6 +18,11 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
+# 添加数据目录创建和权限设置
+RUN mkdir -p /app/data && \
+    chown -R 1000:1000 /app/data && \
+    chmod 777 /app/data
+
 # 复制依赖和源代码
 COPY --from=builder /app/.venv/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
 COPY src/ ./src/

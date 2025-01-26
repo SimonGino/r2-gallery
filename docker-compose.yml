@@ -19,4 +19,6 @@ services:
     env_file:
       - ./backend/.env
     volumes:
-      - ./images.db:/app/images.db
+      - ./data:/app/data  # 修改数据库存储位置
+    environment:
+      - DATABASE_URL=sqlite:///data/images.db  # 添加数据库路径环境变量
