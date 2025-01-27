@@ -18,11 +18,6 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-# 创建数据库目录并设置正确的权限
-RUN mkdir -p /app && \
-    chown -R nobody:nogroup /app && \
-    chmod 777 /app
-
 # 复制依赖和源代码
 COPY --from=builder /app/.venv/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
 COPY src/ ./src/
@@ -30,8 +25,9 @@ COPY src/ ./src/
 # 设置环境变量
 ENV PYTHONPATH=/app
 
-# 切换到非 root 用户
-USER nobody
+# 创建数据库目录并设置权限
+RUN mkdir -p /app/data && \
+    chmod -R 777 /app
 
 EXPOSE 8000
 
