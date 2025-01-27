@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Theme, Text } from '@radix-ui/themes';
-import { UploadIcon } from '@radix-ui/react-icons';
+import { UploadIcon, CopyIcon } from '@radix-ui/react-icons';
 import { useDropzone } from 'react-dropzone';
 import Footer from '../components/Footer';
 import { uploadImage } from '../utils/api';
@@ -32,6 +32,18 @@ const UploadPage = () => {
             setIsUploading(false);
         }
     }, []);
+
+    const copyImageLink = async () => {
+        if (uploadedImage) {
+            try {
+                await navigator.clipboard.writeText(uploadedImage);
+                showToast('链接已复制到剪贴板');
+            } catch (error) {
+                console.error('复制链接失败:', error);
+                showToast('复制链接失败');
+            }
+        }
+    };
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -79,7 +91,16 @@ const UploadPage = () => {
 
                             {uploadedImage && (
                                 <div className="mt-8">
-                                    <Text size="2" className="text-gray-500 mb-4">最近上传的图片：</Text>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <Text size="2" className="text-gray-500">最近上传的图片：</Text>
+                                        <button
+                                            onClick={copyImageLink}
+                                            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                                        >
+                                            <CopyIcon className="w-4 h-4" />
+                                            复制链接
+                                        </button>
+                                    </div>
                                     <div className="overflow-hidden max-w-full flex justify-center items-center">
                                         <img src={uploadedImage} alt="最近上传" className="max-w-full h-auto object-contain" style={{ maxHeight: '80vh' }} />
                                     </div>
