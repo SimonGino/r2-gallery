@@ -31,11 +31,11 @@ jobs:
       with:
         context: ./frontend
         push: true
-        tags: ghcr.io/${{ github.repository_owner | lower }}/r2-gallery-frontend:latest
+        tags: ghcr.io/simongino/r2-gallery-frontend:latest
 
     - name: Build and push Backend
       uses: docker/build-push-action@v4
       with:
         context: ./backend
         push: true
-        tags: ghcr.io/${{ github.repository_owner | lower }}/r2-gallery-backend:latest
+        tags: ghcr.io/simongino/r2-gallery-backend:latest
