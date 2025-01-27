@@ -30,6 +30,9 @@ COPY src/ ./src/
 # 设置环境变量
 ENV PYTHONPATH=/app
 
+# 切换到非 root 用户
+USER nobody
+
 EXPOSE 8000
 
 # 启动应用
