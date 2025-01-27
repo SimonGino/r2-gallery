@@ -25,9 +25,10 @@ COPY src/ ./src/
 # 设置环境变量
 ENV PYTHONPATH=/app
 
-# 创建数据库目录并设置权限
-RUN mkdir -p /app/data && \
-    chmod -R 777 /app
+# 设置数据库文件权限
+RUN touch /app/images.db && \
+    chmod 666 /app/images.db && \
+    chmod 777 /app
 
 EXPOSE 8000
 

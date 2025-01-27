@@ -4,7 +4,7 @@ services:
   init-db:
     image: busybox
     volumes:
-      - ./images.db:/data/images.db
+      - .:/data
     command: sh -c "touch /data/images.db && chmod 666 /data/images.db"
 
   frontend:
@@ -25,4 +25,5 @@ services:
     environment:
       - DATABASE_URL=sqlite:///images.db
     depends_on:
-      - init-db
+      init-db:
+        condition: service_completed_successfully
