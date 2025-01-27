@@ -22,7 +22,7 @@ const BrowsePage = () => {
     const [isSyncing, setIsSyncing] = useState(false);
     const [columnCount, setColumnCount] = useState(() => {
         const saved = localStorage.getItem('columnCount');
-        return saved ? parseInt(saved, 10) : 3;
+        return saved ? parseInt(saved, 10) : 4;
     });
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const loadedKeys = useRef(new Set<string>());

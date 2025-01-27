@@ -1,6 +1,6 @@
 import type { R2Object, ImageListResponse, ImageListParams } from '../types';
 
-export async function listImages({ page, page_size = 10 }: ImageListParams): Promise<ImageListResponse> {
+export async function listImages({ page, page_size = 50 }: ImageListParams): Promise<ImageListResponse> {
     const response = await fetch(
         `/api/images/list?page_size=${page_size}&page=${page}`
     );
