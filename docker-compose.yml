@@ -1,6 +1,12 @@
 version: '3.8'
 
 services:
+  init-db:
+    image: busybox
+    volumes:
+      - ./images.db:/data/images.db
+    command: sh -c "touch /data/images.db && chmod 666 /data/images.db"
+
   frontend:
     image: ghcr.io/simongino/r2-gallery-frontend:latest
     ports:
@@ -17,4 +23,6 @@ services:
     volumes:
       - ./images.db:/app/images.db
     environment:
-      - DATABASE_URL=sqlite:///images.db  # 修改数据库路径
+      - DATABASE_URL=sqlite:///images.db
+    depends_on:
+      - init-db
