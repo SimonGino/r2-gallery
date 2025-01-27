@@ -71,11 +71,22 @@ npm run dev
 
 ## Production Deployment
 
-1. Configure your environment variables in `.env` file
-
-2. Build and start the containers:
+1. Pull the images from GitHub Container Registry:
 ```bash
-docker-compose up -d --build
+docker-compose pull
+```
+
+2. Create .env file in the project root directory and configure your R2 credentials:
+```bash
+CLOUDFLARE_ACCOUNT_ID=your_account_id
+CLOUDFLARE_ACCESS_KEY_ID=your_access_key_id
+CLOUDFLARE_SECRET_ACCESS_KEY=your_secret_access_key
+BUCKET_NAME=your_bucket_name
+BUCKET_ENDPOINT=your_bucket_endpoint
+```
+3.Start the containers:
+```bash
+docker-compose up -d
 ```
 
 The application will be available at http://localhost:80

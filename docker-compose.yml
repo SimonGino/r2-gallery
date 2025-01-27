@@ -2,23 +2,19 @@ version: '3.8'
 
 services:
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: ghcr.io/simongino/r2-gallery-frontend:latest
     ports:
       - "80:80"
     depends_on:
       - backend
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: ghcr.io/simongino/r2-gallery-backend:latest
     ports:
       - "8000:8000"
     env_file:
-      - ./backend/.env
+      - .env
     volumes:
-      - ./data:/app/data  # 修改数据库存储位置
+      - ./images.db:/app/images.db
     environment:
-      - DATABASE_URL=sqlite:///data/images.db  # 添加数据库路径环境变量
+      - DATABASE_URL=sqlite:///images.db  # 修改数据库路径

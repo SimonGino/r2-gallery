@@ -70,11 +70,23 @@ npm run dev
 
 ## 生产环境部署
 
-1. 在 `.env` 文件中配置环境变量
-
-2. 构建并启动容器：
+1. 从 GitHub Container Registry 拉取镜像：
 ```bash
-docker-compose up -d --build
+docker-compose pull
+```
+
+2. 在项目根目录创建 .env 文件并配置你的 R2 凭证：
+```bash
+CLOUDFLARE_ACCOUNT_ID=你的账号ID
+CLOUDFLARE_ACCESS_KEY_ID=你的访问密钥ID
+CLOUDFLARE_SECRET_ACCESS_KEY=你的访问密钥
+BUCKET_NAME=你的存储桶名称
+BUCKET_ENDPOINT=你的存储桶访问端点
+```
+
+3. 启动容器：
+```bash
+docker-compose up -d
 ```
 
 应用将在 http://localhost:80 上可访问
