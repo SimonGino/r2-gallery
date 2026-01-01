@@ -15,6 +15,7 @@ import type { R2Object } from "../types";
 import { useToast } from "../components/Toast/Toast";
 import Footer from "../components/Footer";
 import LazyImage from "../components/LazyImage";
+import ImageViewer from "../components/ImageViewer";
 import {
   listImages,
   downloadImage,
@@ -30,7 +31,7 @@ const BrowsePage = () => {
   const [hasMore, setHasMore] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(-1);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [columnCount, setColumnCount] = useState(() => {
@@ -220,23 +221,13 @@ const BrowsePage = () => {
                 </Dialog.Portal>
               </Dialog.Root>
 
-              <Dialog.Root
-                open={!!selectedImage}
-                onOpenChange={(open) => !open && setSelectedImage(null)}
-              >
-                <Dialog.Portal>
-                  <Dialog.Overlay className="fixed inset-0 bg-black/50 animate-fade-in" />
-                  <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[90vw] max-h-[90vh] animate-fade-in">
-                    {selectedImage && (
-                      <img
-                        src={selectedImage}
-                        alt="预览图片"
-                        className="w-auto h-auto max-w-full max-h-[90vh] object-contain"
-                      />
-                    )}
-                  </Dialog.Content>
-                </Dialog.Portal>
-              </Dialog.Root>
+              <ImageViewer
+                images={objects.filter(
+                  (obj) => obj.key && isImageFile(obj.key),
+                )}
+                currentIndex={selectedImageIndex}
+                onClose={() => setSelectedImageIndex(-1)}
+              />
 
               <InfiniteScroll
                 dataLength={objects.length}
@@ -269,7 +260,7 @@ const BrowsePage = () => {
                 >
                   {objects
                     .filter((obj) => obj.key && isImageFile(obj.key))
-                    .map((object) => (
+                    .map((object, index) => (
                       <div key={object.key} className="waterfall-item">
                         <div className="relative">
                           <LazyImage
@@ -277,7 +268,7 @@ const BrowsePage = () => {
                             alt={object.key}
                             width={object.width}
                             height={object.height}
-                            onClick={() => setSelectedImage(object.url)}
+                            onClick={() => setSelectedImageIndex(index)}
                           />
                           <div className="image-overlay flex flex-col justify-between p-4">
                             <div className="image-actions flex justify-end gap-2">
@@ -291,7 +282,7 @@ const BrowsePage = () => {
                                 <DownloadIcon className="w-4 h-4" />
                               </button>
                               <button
-                                onClick={() => setSelectedImage(object.url)}
+                                onClick={() => setSelectedImageIndex(index)}
                                 title="查看原图"
                                 className="p-2 hover:bg-gray-200 rounded-full bg-white/80"
                               >
