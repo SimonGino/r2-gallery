@@ -6,25 +6,24 @@
 
 .waterfall-wrapper {
   display: flex;
-  margin-left: -20px;
+  margin-left: -16px;
   width: auto;
 }
 
 .waterfall-column {
-  padding-left: 20px;
+  padding-left: 16px;
   background-clip: padding-box;
 }
 
 .waterfall-item {
   break-inside: avoid;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .image-wrapper {
   position: relative;
   overflow: hidden;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
   max-height: 600px;
 }
