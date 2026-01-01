@@ -31,6 +31,45 @@ A modern web application for managing and browsing images stored in Cloudflare R
 
 ### Backend Setup
 
+#### Option 1: Using uv (Recommended)
+
+1. Navigate to the backend directory:
+```bash
+cd backend
+```
+
+2. Copy the environment template and configure your R2 credentials:
+```bash
+cp .env.example .env
+# Edit .env and fill in your Cloudflare R2 credentials
+```
+
+3. Create virtual environment with uv (Python 3.9 required):
+```bash
+# Install uv if not already installed
+# curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create Python 3.9 virtual environment
+uv venv --python 3.9
+
+# Activate virtual environment
+source .venv/bin/activate  # macOS/Linux
+# or
+.venv\Scripts\activate  # Windows
+```
+
+4. Install dependencies:
+```bash
+uv pip install -e .
+```
+
+5. Start the development server:
+```bash
+uvicorn src.main:app --reload --port 8000
+```
+
+#### Option 2: Using PDM
+
 1. Navigate to the backend directory:
 ```bash
 cd backend
@@ -49,7 +88,7 @@ pdm install
 
 4. Start the development server:
 ```bash
-pdm run dev
+pdm run start
 ```
 
 ### Frontend Setup
@@ -66,6 +105,25 @@ npm install
 
 3. Start the development server:
 ```bash
+npm run dev
+```
+
+The frontend will be available at http://localhost:5173 and will proxy API requests to the backend at http://localhost:8000.
+
+### Running Both Services Together
+
+Open two terminal windows:
+
+**Terminal 1 - Backend:**
+```bash
+cd backend
+source .venv/bin/activate  # if using uv
+uvicorn src.main:app --reload --port 8000
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd frontend
 npm run dev
 ```
 
