@@ -3,6 +3,8 @@ export interface R2Object {
   last_modified: string;
   size: number;
   url: string;
+  width?: number; // Image width in pixels
+  height?: number; // Image height in pixels
 }
 
 export interface ImageListResponse {

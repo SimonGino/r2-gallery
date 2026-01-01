@@ -14,6 +14,7 @@ import Masonry from "react-masonry-css";
 import type { R2Object } from "../types";
 import { useToast } from "../components/Toast/Toast";
 import Footer from "../components/Footer";
+import LazyImage from "../components/LazyImage";
 import {
   listImages,
   downloadImage,
@@ -34,7 +35,7 @@ const BrowsePage = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [columnCount, setColumnCount] = useState(() => {
     const saved = localStorage.getItem("columnCount");
-    return saved ? parseInt(saved, 10) : 4;
+    return saved ? parseInt(saved, 10) : 3; // Default to 3 columns for better loading performance
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const loadedKeys = useRef(new Set<string>());
@@ -247,7 +248,7 @@ const BrowsePage = () => {
                 hasMore={hasMore}
                 loader={<div className="loading">加载中...</div>}
                 endMessage={<div className="no-more">没有更多图片了</div>}
-                scrollThreshold="50px"
+                scrollThreshold="300px"
                 scrollableTarget="scrollableDiv"
                 className="waterfall-container"
               >
@@ -270,20 +271,13 @@ const BrowsePage = () => {
                     .filter((obj) => obj.key && isImageFile(obj.key))
                     .map((object) => (
                       <div key={object.key} className="waterfall-item">
-                        <div className="image-wrapper">
-                          <img
+                        <div className="relative">
+                          <LazyImage
                             src={object.url}
                             alt={object.key}
-                            loading="lazy"
+                            width={object.width}
+                            height={object.height}
                             onClick={() => setSelectedImage(object.url)}
-                            className="cursor-pointer transition-opacity duration-300"
-                            style={{
-                              opacity: "0",
-                            }}
-                            onLoad={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.opacity = "1";
-                            }}
                           />
                           <div className="image-overlay flex flex-col justify-between p-4">
                             <div className="image-actions flex justify-end gap-2">

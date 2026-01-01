@@ -1,0 +1,61 @@
+import { useState } from 'react';
+import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
+import ImageSkeleton from './ImageSkeleton';
+
+interface LazyImageProps {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  className?: string;
+  onClick?: () => void;
+}
+
+export default function LazyImage({
+  src,
+  alt,
+  width,
+  height,
+  className = '',
+  onClick,
+}: LazyImageProps) {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const { targetRef, hasIntersected } = useIntersectionObserver({
+    rootMargin: '300px', // Start loading 300px before entering viewport
+    threshold: 0.01,
+  });
+
+  const aspectRatio = width && height ? `${width} / ${height}` : 'auto';
+
+  return (
+    <div
+      ref={targetRef as React.RefObject<HTMLDivElement>}
+      className="image-wrapper relative"
+    >
+      {/* Skeleton placeholder */}
+      {!isLoaded && width && height && (
+        <div className="absolute inset-0 z-0">
+          <ImageSkeleton aspectRatio={aspectRatio} />
+        </div>
+      )}
+
+      {/* Actual image - only load when in viewport */}
+      {hasIntersected && (
+        <img
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          onClick={onClick}
+          className={`cursor-pointer transition-opacity duration-300 relative z-10 ${className}`}
+          style={{
+            opacity: isLoaded ? '1' : '0',
+            aspectRatio: aspectRatio,
+          }}
+          onLoad={() => setIsLoaded(true)}
+          onError={() => setIsLoaded(true)} // Show broken image state
+        />
+      )}
+    </div>
+  );
+}
