@@ -15,6 +15,8 @@ class Image(Base):
     size = Column(Integer)
     last_modified = Column(DateTime, index=True)
     url = Column(String)
+    width = Column(Integer)  # Image width in pixels
+    height = Column(Integer)  # Image height in pixels
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

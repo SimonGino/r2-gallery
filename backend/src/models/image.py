@@ -3,14 +3,15 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
+
 class ImageObject(BaseModel):
     key: str
     last_modified: datetime
     size: int
     url: str
+    width: Optional[int] = None  # Image width in pixels
+    height: Optional[int] = None  # Image height in pixels
 
-    size: int
-    url: str
 
 class ImageListResponse(BaseModel):
     items: List[ImageObject]

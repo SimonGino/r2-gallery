@@ -11,15 +11,15 @@ R2 Gallery is a full-stack web application for managing and browsing images stor
 ### Backend (FastAPI + SQLite)
 - **Entry point**: `backend/src/main.py` - FastAPI app with CORS middleware
 - **Core modules**:
-  - `core/storage.py` - R2 client initialization and thumbnail generation using boto3 and Pillow
+  - `core/storage.py` - R2 client initialization using boto3
   - `core/sync.py` - Background sync task that synchronizes R2 storage with local SQLite database
   - `core/config.py` - Pydantic settings management for R2 credentials
 - **Data layer**:
-  - `models/database.py` - SQLAlchemy Image model with fields: key, size, last_modified, url, thumbnail_url
+  - `models/database.py` - SQLAlchemy Image model with fields: key, size, last_modified, url
   - Uses SQLite (`images.db`) as metadata store
-- **API**: `api/images.py` - Image CRUD operations, upload with MD5-based naming, thumbnail generation, sync endpoint
+- **API**: `api/images.py` - Image CRUD operations, upload with MD5-based naming, sync endpoint
 
-**Key workflow**: On startup, a background task syncs R2 bucket contents to SQLite. Images are stored with format `{timestamp}_{md5hash}.ext`, thumbnails as `thumb_{filename}`.
+**Key workflow**: On startup, a background task syncs R2 bucket contents to SQLite. Images are stored with format `{timestamp}_{md5hash}.ext`.
 
 ### Frontend (React + TypeScript + Vite)
 - **Routing**: React Router with two pages - BrowsePage (/) and UploadPage (/upload)
@@ -37,14 +37,14 @@ cd backend
 
 # Using uv (recommended, requires Python 3.9)
 uv venv --python 3.9
-source .venv/bin/activate  # macOS/Linux
+source .venv/bin/activate  # macOS/Linux, or .venv\Scripts\activate on Windows
 uv pip install -e .
 uvicorn src.main:app --reload --port 8000
 
 # Using PDM (alternative)
 pip install pdm
 pdm install
-pdm run start
+pdm run start  # Runs uvicorn with auto-reload
 ```
 
 ### Frontend
@@ -85,14 +85,13 @@ Frontend dev server proxies `/api/*` requests to `http://localhost:8000`.
    - File validation (image MIME type, extensions: jpg/jpeg/png/gif/webp)
    - MD5 hash generation for deduplication
    - Filename format: `{timestamp}_{md5}.ext`
-   - Original image + thumbnail (300x300 JPEG, 85% quality) uploaded to R2
+   - Original image uploaded to R2
    - Metadata saved to SQLite
 
 2. **Sync Mechanism**:
    - Runs automatically on backend startup
    - Can be triggered manually via `POST /api/images/sync`
    - Compares R2 bucket contents with SQLite, adds new images, removes deleted ones
-   - Automatically generates missing thumbnails
 
 3. **Database Schema**:
    - Single `images` table with indexed `key` and `last_modified` columns
@@ -102,11 +101,12 @@ Frontend dev server proxies `/api/*` requests to `http://localhost:8000`.
 4. **Pagination**:
    - Backend supports `page` (1-indexed) and `page_size` (1-50) query params
    - Returns `has_more` flag for infinite scroll
-   - Default page size: 50 items
+   - Default page size: 20 items
+   - Frontend requests 20 images per page for optimal loading performance
 
 ## Common Patterns
 
 - Backend uses dependency injection via FastAPI's `Depends()` for database sessions
 - All API errors return HTTPException with appropriate status codes
 - Frontend uses async/await for all API calls
-- Thumbnail generation handles RGBA images by converting to RGB with white background
+- Infinite scroll triggers new page load 300px before reaching bottom for smooth user experience

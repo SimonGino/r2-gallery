@@ -6,6 +6,7 @@ from typing import List, Optional
 
 from botocore.exceptions import ClientError
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, UploadFile
+from PIL import Image as PILImage
 from sqlalchemy.orm import Session
 
 from ..core.config import get_settings
@@ -32,7 +33,7 @@ async def sync_images_manually():
 
 @router.get("/list", response_model=ImageListResponse)
 async def list_images(
-    page_size: int = Query(default=10, ge=1, le=50),  # 限制页面大小
+    page_size: int = Query(default=20, ge=1, le=50),  # limit page size
     page: int = Query(default=1, ge=1),  # 页码必须大于等于1
     db: Session = Depends(get_db),
 ):
@@ -62,6 +63,8 @@ async def list_images(
                     last_modified=img.last_modified,
                     size=img.size,
                     url=img.url,
+                    width=img.width,
+                    height=img.height,
                 )
                 for img in images
             ],
@@ -89,6 +92,10 @@ async def upload_image(file: UploadFile, db: Session = Depends(get_db)):
         # Read file content
         content = await file.read()
 
+        # Get image dimensions
+        img = PILImage.open(io.BytesIO(content))
+        width, height = img.size
+
         # Calculate MD5
         md5_hash = hashlib.md5(content).hexdigest()
 
@@ -102,12 +109,14 @@ async def upload_image(file: UploadFile, db: Session = Depends(get_db)):
         # Get file metadata
         response = s3_client.head_object(Bucket=settings.BUCKET_NAME, Key=file_name)
 
-        # Save to database (without thumbnail_url)
+        # Save to database with width and height
         image = Image(
             key=file_name,
             size=len(content),
             last_modified=response["LastModified"],
             url=f"https://{settings.BUCKET_ENDPOINT}/{file_name}",
+            width=width,
+            height=height,
         )
         db.add(image)
         db.commit()
@@ -119,6 +128,8 @@ async def upload_image(file: UploadFile, db: Session = Depends(get_db)):
             last_modified=image.last_modified,
             size=image.size,
             url=image.url,
+            width=image.width,
+            height=image.height,
         )
 
     except Exception as e:
