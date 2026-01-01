@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
-import ImageSkeleton from './ImageSkeleton';
+import { useState } from "react";
+import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
+import ImageSkeleton from "./ImageSkeleton";
 
 interface LazyImageProps {
   src: string;
@@ -9,6 +9,7 @@ interface LazyImageProps {
   height?: number;
   className?: string;
   onClick?: () => void;
+  children?: React.ReactNode;
 }
 
 export default function LazyImage({
@@ -16,16 +17,17 @@ export default function LazyImage({
   alt,
   width,
   height,
-  className = '',
+  className = "",
   onClick,
+  children,
 }: LazyImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const { targetRef, hasIntersected } = useIntersectionObserver({
-    rootMargin: '300px', // Start loading 300px before entering viewport
+    rootMargin: "300px", // Start loading 300px before entering viewport
     threshold: 0.01,
   });
 
-  const aspectRatio = width && height ? `${width} / ${height}` : 'auto';
+  const aspectRatio = width && height ? `${width} / ${height}` : "auto";
 
   return (
     <div
@@ -49,13 +51,16 @@ export default function LazyImage({
           onClick={onClick}
           className={`cursor-pointer transition-opacity duration-300 relative z-10 ${className}`}
           style={{
-            opacity: isLoaded ? '1' : '0',
+            opacity: isLoaded ? "1" : "0",
             aspectRatio: aspectRatio,
           }}
           onLoad={() => setIsLoaded(true)}
           onError={() => setIsLoaded(true)} // Show broken image state
         />
       )}
+
+      {/* Overlay content slot */}
+      {children}
     </div>
   );
 }

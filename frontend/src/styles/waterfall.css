@@ -1,152 +1,138 @@
 .waterfall-container {
-  width: 100%;
-  padding: 0;
-  margin: 0 auto;
+    width: 100%;
+    padding: 0;
+    margin: 0 auto;
 }
 
 .waterfall-wrapper {
-  display: flex;
-  margin-left: -16px;
-  width: auto;
+    display: flex;
+    margin-left: -16px;
+    width: auto;
 }
 
 .waterfall-column {
-  padding-left: 16px;
-  background-clip: padding-box;
+    padding-left: 16px;
+    background-clip: padding-box;
 }
 
 .waterfall-item {
-  break-inside: avoid;
-  margin-bottom: 16px;
+    break-inside: avoid;
+    margin-bottom: 16px;
 }
 
 .image-wrapper {
-  position: relative;
-  overflow: hidden;
-  border-radius: 8px;
-  transition: transform 0.3s ease;
-  max-height: 600px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+    max-height: 600px;
 }
 
 .image-wrapper img {
-  width: 100%;
-  height: auto;
-  max-height: 600px;
-  object-fit: contain;
-  display: block;
-  transition: filter 0.3s ease;
+    width: 100%;
+    height: auto;
+    max-height: 600px;
+    object-fit: contain;
+    display: block;
+    transition: filter 0.3s ease;
 }
 
+/* Overlay container - covers entire image */
 .image-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: transparent;
-  padding: 12px;
-  opacity: 0;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    padding: 12px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 20;
+    pointer-events: none;
 }
 
 .image-wrapper:hover .image-overlay {
-  opacity: 1;
-  background: rgba(0, 0, 0, 0.1);
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.5);
+    pointer-events: auto;
 }
 
+/* Action buttons container */
 .image-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  padding: 4px;
-  transform: translateY(-10px);
-  opacity: 0;
-  transition: all 0.3s ease;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    padding: 4px;
+    transform: translateY(-10px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 30;
 }
 
 .image-wrapper:hover .image-actions {
-  transform: translateY(0);
-  opacity: 1;
+    transform: translateY(0);
+    opacity: 1;
 }
 
+/* Individual action buttons */
 .image-actions button {
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  border-radius: 50%;
-  padding: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(4px);
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .image-actions button:hover {
-  background: rgba(255, 255, 255, 1);
-  transform: scale(1.1);
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .image-actions button svg {
-  width: 16px;
-  height: 16px;
-  color: #333;
+    width: 18px;
+    height: 18px;
+    color: #333;
 }
 
+/* Image info container */
 .image-info {
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 8px;
-  padding: 8px 12px;
-  backdrop-filter: blur(4px);
-  transform: translateY(10px);
-  opacity: 0;
-  transition: all 0.3s ease;
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 8px;
+    padding: 10px 14px;
+    backdrop-filter: blur(8px);
+    transform: translateY(10px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 30;
 }
 
 .image-wrapper:hover .image-info {
-  transform: translateY(0);
-  opacity: 1;
+    transform: translateY(0);
+    opacity: 1;
 }
 
 .image-info span {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 500;
 }
 
-.image-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.image-actions button {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  border-radius: 4px;
-  padding: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.image-actions button:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.image-actions button svg {
-  width: 20px;
-  height: 20px;
-  color: white;
-}
-
+/* Loading and no more messages */
 .loading,
 .no-more {
-  text-align: center;
-  padding: 20px;
-  color: #666;
-  font-size: 0.875rem;
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-size: 0.875rem;
 }

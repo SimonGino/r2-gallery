@@ -18,7 +18,6 @@ const ImageViewer = ({ images, currentIndex, onClose }: ImageViewerProps) => {
   const slides = images.map((img) => ({
     src: img.url,
     alt: img.key,
-    title: img.key.split("/").pop() || img.key,
     description: `${img.width || "?"}×${img.height || "?"} - ${formatSize(img.size)}`,
     download: img.url,
     width: img.width,

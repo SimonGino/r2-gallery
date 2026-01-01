@@ -262,43 +262,50 @@ const BrowsePage = () => {
                     .filter((obj) => obj.key && isImageFile(obj.key))
                     .map((object, index) => (
                       <div key={object.key} className="waterfall-item">
-                        <div className="relative">
-                          <LazyImage
-                            src={object.url}
-                            alt={object.key}
-                            width={object.width}
-                            height={object.height}
-                            onClick={() => setSelectedImageIndex(index)}
-                          />
+                        <LazyImage
+                          src={object.url}
+                          alt={object.key}
+                          width={object.width}
+                          height={object.height}
+                          onClick={() => setSelectedImageIndex(index)}
+                        >
                           <div className="image-overlay flex flex-col justify-between p-4">
                             <div className="image-actions flex justify-end gap-2">
                               <button
-                                onClick={() =>
-                                  object.key && downloadFile(object.key)
-                                }
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  object.key && downloadFile(object.key);
+                                }}
                                 title="下载"
                                 className="p-2 hover:bg-gray-200 rounded-full bg-white/80"
                               >
                                 <DownloadIcon className="w-4 h-4" />
                               </button>
                               <button
-                                onClick={() => setSelectedImageIndex(index)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedImageIndex(index);
+                                }}
                                 title="查看原图"
                                 className="p-2 hover:bg-gray-200 rounded-full bg-white/80"
                               >
                                 <EyeOpenIcon className="w-4 h-4" />
                               </button>
                               <button
-                                onClick={() => copyLink(object.url)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  copyLink(object.url);
+                                }}
                                 title="复制链接"
                                 className="p-2 hover:bg-gray-200 rounded-full bg-white/80"
                               >
                                 <CopyIcon className="w-4 h-4" />
                               </button>
                               <button
-                                onClick={() =>
-                                  object.key && handleDelete(object.key)
-                                }
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  object.key && handleDelete(object.key);
+                                }}
                                 title="删除"
                                 className="p-2 hover:bg-gray-200 rounded-full bg-white/80"
                               >
@@ -312,7 +319,7 @@ const BrowsePage = () => {
                               </span>
                             </div>
                           </div>
-                        </div>
+                        </LazyImage>
                       </div>
                     ))}
                 </Masonry>
