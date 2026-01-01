@@ -1,0 +1,24 @@
+# Development environment overrides
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+services:
+  backend:
+    # Expose backend port for direct API testing
+    ports:
+      - "8000:8000"
+    # Enable hot reload (if using volume mount)
+    volumes:
+      - ./backend/src:/app/src
+    # Use local build instead of pulling from registry
+    # build:
+    #   context: ./backend
+    #   dockerfile: Dockerfile
+
+  frontend:
+    # Use different port to avoid conflict with other services
+    ports:
+      - "5173:80"
+    # Use local build
+    # build:
+    #   context: ./frontend
+    #   dockerfile: Dockerfile

@@ -1,11 +1,10 @@
-version: "3.8"
-
 services:
   backend:
     image: ghcr.io/simongino/r2-gallery-backend:latest
     container_name: r2-gallery-backend
-    ports:
-      - "8000:8000"
+    # 生产环境不暴露后端端口（更安全）
+    # ports:
+    #   - "8000:8000"
     env_file:
       - .env
     volumes:
@@ -25,12 +24,14 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    networks:
+      - app-network
 
   frontend:
     image: ghcr.io/simongino/r2-gallery-frontend:latest
     container_name: r2-gallery-frontend
     ports:
-      - "80:80"
+      - "80:80" # 只暴露前端端口
     depends_on:
       backend:
         condition: service_healthy
@@ -49,6 +50,12 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   db-data:
