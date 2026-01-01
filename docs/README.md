@@ -33,6 +33,21 @@
 
 ---
 
+### 3. [Docker 部署和 CI/CD 指南](./DEPLOYMENT.md)
+**内容：** Docker 镜像构建、版本管理和生产环境部署
+
+**包含：**
+- GitHub Actions 自动构建配置
+- 镜像标签管理（latest、版本号、Git SHA）
+- 语义化版本发布流程
+- 生产环境部署步骤
+- 回滚操作指南
+- 故障排查和最佳实践
+
+**适合：** DevOps 工程师和运维人员
+
+---
+
 ## 🎯 快速导航
 
 ### 我想了解...
@@ -41,6 +56,9 @@
 - **性能优化** → 查看 [后端技术流程分析 - 优化建议](./backend-flow-analysis.md#5-推荐改进优先级)
 - **CDN 配置** → 查看 [CDN 缓存配置指南](./CDN-SETUP-GUIDE.md)
 - **降低成本** → 查看 [CDN 成本对比](./CDN-SETUP-GUIDE.md#-成本对比)
+- **部署应用** → 查看 [Docker 部署指南](./DEPLOYMENT.md)
+- **版本管理** → 查看 [版本发布流程](./DEPLOYMENT.md#-版本管理工作流)
+- **故障排查** → 查看 [故障排查指南](./DEPLOYMENT.md#-故障排查)
 
 ---
 
@@ -50,6 +68,7 @@
 |------|------|---------|
 | 2026-01-01 | backend-flow-analysis.md | 创建后端流程分析文档 |
 | 2026-01-01 | CDN-SETUP-GUIDE.md | 创建 CDN 配置完整指南 |
+| 2026-01-01 | DEPLOYMENT.md | 创建 Docker 部署和 CI/CD 指南 |
 | 2026-01-01 | README.md | 创建文档索引 |
 
 ---

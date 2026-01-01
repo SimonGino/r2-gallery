@@ -1,21 +1,9 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  init-db:
-    image: busybox
-    volumes:
-      - .:/data
-    command: sh -c "touch /data/images.db && chmod 666 /data/images.db"
-
-  frontend:
-    image: ghcr.io/simongino/r2-gallery-frontend:latest
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-
   backend:
     image: ghcr.io/simongino/r2-gallery-backend:latest
+    container_name: r2-gallery-backend
     ports:
       - "8000:8000"
     env_file:
@@ -23,7 +11,45 @@ services:
     volumes:
       - ./images.db:/app/images.db
     environment:
-      - DATABASE_URL=sqlite:///images.db
+      - DATABASE_URL=sqlite:///app/images.db
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/images/list?page=1&page_size=1')",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    image: ghcr.io/simongino/r2-gallery-frontend:latest
+    container_name: r2-gallery-frontend
+    ports:
+      - "80:80"
     depends_on:
-      init-db:
-        condition: service_completed_successfully
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:80",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  db-data:
+    driver: local
