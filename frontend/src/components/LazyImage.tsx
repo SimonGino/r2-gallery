@@ -4,6 +4,7 @@ import ImageSkeleton from "./ImageSkeleton";
 
 interface LazyImageProps {
   src: string;
+  thumbnailSrc?: string;
   alt: string;
   width?: number;
   height?: number;
@@ -14,6 +15,7 @@ interface LazyImageProps {
 
 export default function LazyImage({
   src,
+  thumbnailSrc,
   alt,
   width,
   height,
@@ -28,6 +30,7 @@ export default function LazyImage({
   });
 
   const aspectRatio = width && height ? `${width} / ${height}` : "auto";
+  const displaySrc = thumbnailSrc || src;
 
   return (
     <div
@@ -44,7 +47,7 @@ export default function LazyImage({
       {/* Actual image - only load when in viewport */}
       {hasIntersected && (
         <img
-          src={src}
+          src={displaySrc}
           alt={alt}
           width={width}
           height={height}

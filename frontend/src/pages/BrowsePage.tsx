@@ -23,6 +23,7 @@ import {
   syncImages,
 } from "../utils/api";
 import { formatSize, formatDate, isImageFile } from "../utils/format";
+import { getThumbnailUrl } from "../utils/imageTransform";
 import "@radix-ui/themes/styles.css";
 import "../styles/waterfall.css";
 
@@ -264,6 +265,7 @@ const BrowsePage = () => {
                       <div key={object.key} className="waterfall-item">
                         <LazyImage
                           src={object.url}
+                          thumbnailSrc={getThumbnailUrl(object.url)}
                           alt={object.key}
                           width={object.width}
                           height={object.height}
